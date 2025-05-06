@@ -1,6 +1,8 @@
 # dependencies (bun install)
 node_modules
 
+.wrangler
+
 # output
 out
 dist
@@ -21,6 +23,7 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 .env.test.local
 .env.production.local
 .env.local
+.dev.vars
 
 # caches
 .eslintcache

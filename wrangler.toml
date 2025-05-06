@@ -1,5 +1,6 @@
 name = "zchat"
 compatibility_date = "2025-05-01"
+compatibility_flags = [ "nodejs_compat" ]
 main = "src/worker/index.ts"
 
 [[durable_objects.bindings]]
