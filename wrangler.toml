@@ -1,0 +1,17 @@
+name = "zchat"
+compatibility_date = "2025-05-01"
+main = "src/worker/index.ts"
+
+[[durable_objects.bindings]]
+name = "CHAT"
+class_name = "Chat"
+
+[[migrations]]
+tag = "v1"
+new_classes = [ "Chat" ]
+
+[build]
+command = "true" # skip build step; Bun handles it, or you run wrangler directly with TS
+
+[triggers]
+crons = []
