@@ -29,6 +29,7 @@ export class Chat {
         // Create a transform stream for proper streaming
         const { readable, writable } = new TextEncoderStream();
         const writer = writable.getWriter();
+        const input = await request.text();
 
         // Start streaming in the background
         (async () => {
@@ -38,8 +39,7 @@ export class Chat {
               input: [
                 {
                   role: "user",
-                  // Try a longer prompt to encourage more chunks from OpenAI
-                  content: "What does GPT stand for?",
+                  content: input,
                 },
               ],
               stream: true,

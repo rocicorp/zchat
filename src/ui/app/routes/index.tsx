@@ -1,15 +1,21 @@
 // app/routes/index.tsx
 import { createFileRoute } from "@tanstack/react-router";
+import { useRef, useState } from "react";
 
 export const Route = createFileRoute("/")({
   component: Home,
 });
 
 function Home() {
-  const doit = async () => {
-    console.log("Fetching stream from /chat...");
+  const [output, setOutput] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const onSubmit = async () => {
     try {
-      const response = await fetch("http://localhost:8787/chat");
+      const response = await fetch("http://localhost:8787/chat", {
+        method: "POST",
+        body: inputRef.current!.value,
+      });
 
       if (!response.ok) {
         alert(`Error: ${response.status} ${response.statusText}`);
@@ -23,24 +29,27 @@ function Home() {
 
       const decoder = new TextDecoder();
 
-      console.log("Starting to read stream:");
-      let total = "";
+      setOutput("");
       for await (const value of response.body) {
         const chunk = decoder.decode(value, { stream: true });
-        total += chunk;
-        console.log("Received chunk:", chunk);
+        setOutput((prev) => prev + chunk);
       }
-      console.log("Stream complete.");
-      console.log("Total:", total);
     } catch (error) {
-      console.error("Error during stream fetch:", error);
       alert(`Streaming Error: ${error.message}`);
     }
   };
 
   return (
-    <button type="button" onClick={doit}>
-      Fetch and Log Stream
-    </button>
+    <>
+      <div>
+        <input ref={inputRef} type="text" placeholder="Ask something..." />
+        <button type="button" onClick={onSubmit}>
+          Submit
+        </button>
+      </div>
+      <div>
+        <textarea rows={10} cols={50} value={output}></textarea>
+      </div>
+    </>
   );
 }
