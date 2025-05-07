@@ -1,34 +1,57 @@
 import OpenAI from "openai";
 
 export class Chat {
-  state: DurableObjectState;
-  value: number = 0;
-  env: Env;
+  #env: Env;
+  #client: OpenAI;
 
-  constructor(state: DurableObjectState, env: Env) {
-    this.state = state;
-    this.env = env;
+  constructor(_state: DurableObjectState, env: Env) {
+    this.#env = env;
+    this.#client = new OpenAI({
+      apiKey: this.#env.OPENAI_API_KEY,
+    });
   }
 
   async fetch(request: Request): Promise<Response> {
     const url = new URL(request.url);
     switch (url.pathname) {
-      case "/increment":
-        this.value += 1;
-        return new Response(this.value.toString());
-      case "/value":
-        return new Response(this.value.toString());
+      case "/hello":
+        return new Response("hello");
       case "/chat":
-        const client = new OpenAI({
-          apiKey: this.env.OPENAI_API_KEY,
-        });
+        // Create a transform stream for proper streaming
+        const { readable, writable } = new TextEncoderStream();
+        const writer = writable.getWriter();
 
-        const response = await client.responses.create({
-          model: "gpt-4.1",
-          input: "Write a one-sentence bedtime story about a unicorn.",
-        });
+        // Start streaming in the background
+        const streamPromise = (async () => {
+          try {
+            const llmStream = await this.#client.responses.create({
+              model: "gpt-3.5-turbo",
+              input: [
+                {
+                  role: "user",
+                  content: "Best ska album of all time?",
+                },
+              ],
+              stream: true,
+            });
 
-        return new Response(response.output_text);
+            // Add timestamps to verify streaming
+            for await (const chunk of llmStream) {
+              if (chunk.type === "response.output_text.delta") {
+                await writer.write(chunk.delta);
+              }
+            }
+          } finally {
+            await writer.close();
+          }
+        })();
+
+        return new Response(readable, {
+          headers: {
+            "Content-Type": "text/plain; charset=utf-8",
+            Connection: "keep-alive",
+          },
+        });
       default:
         return new Response("Not found", { status: 404 });
     }

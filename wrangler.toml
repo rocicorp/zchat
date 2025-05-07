@@ -16,3 +16,5 @@ command = "true" # skip build step; Bun handles it, or you run wrangler directly
 
 [triggers]
 crons = []
+
+[vars]
