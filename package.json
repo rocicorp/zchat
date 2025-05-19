@@ -9,7 +9,9 @@
     "dev:ui": "cd src/ui && vinxi dev",
     "build:ui": "cd src/ui && vinxi build",
     "start:ui": "cd src/ui && vinxi start",
-    "dev:cf": "cd src/worker && bunx wrangler dev"
+    "dev:cf": "cd src/worker && bunx wrangler dev",
+    "drizzle:push": "drizzle-kit push --config src/db/drizzle.config.ts",
+    "z": "dotenvx run -f env.txt -- zero-cache-dev"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250506.0",
@@ -28,10 +30,12 @@
     "typescript": "^5.8.3"
   },
   "dependencies": {
+    "@rocicorp/zero": "^0.19.2025050203",
     "@tanstack/react-router": "^1.120.2",
     "@tanstack/react-start": "^1.120.2",
     "dotenv": "^16.5.0",
     "drizzle-orm": "^0.43.1",
+    "drizzle-zero": "^0.9.3",
     "openai": "^4.97.0",
     "pg": "^8.15.6",
     "react": "^19.1.0",

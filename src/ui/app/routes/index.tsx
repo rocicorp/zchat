@@ -35,7 +35,7 @@ function Home() {
         setOutput((prev) => prev + chunk);
       }
     } catch (error) {
-      alert(`Streaming Error: ${error.message}`);
+      alert(`Streaming Error: ${String(error)}`);
     }
   };
 
